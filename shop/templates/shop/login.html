@@ -1,0 +1,27 @@
+{% extends 'shop/base.html' %}
+{% load static %}
+{% block title %}Вход — Магазин обуви{% endblock %}
+{% block content %}
+<div style="max-width: 400px; margin: 40px auto; background: #fff; padding: 32px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,.1);">
+    <h1 style="margin-top: 0;">Вход</h1>
+    <p>Введите логин и пароль из базы данных или перейдите к просмотру товаров в роли гостя.</p>
+    <form method="post" action="{% url 'shop:login' %}">
+        {% csrf_token %}
+        {% if form.non_field_errors %}<ul class="messages"><li class="error">{{ form.non_field_errors }}</li></ul>{% endif %}
+        <p>
+            <label for="id_username">Логин:</label><br>
+            <input type="text" name="username" id="id_username" required autofocus style="width: 100%; padding: 8px;">
+            {% if form.username.errors %}<span style="color: red;">{{ form.username.errors }}</span>{% endif %}
+        </p>
+        <p>
+            <label for="id_password">Пароль:</label><br>
+            <input type="password" name="password" id="id_password" required style="width: 100%; padding: 8px;">
+            {% if form.password.errors %}<span style="color: red;">{{ form.password.errors }}</span>{% endif %}
+        </p>
+        <p>
+            <button type="submit" class="btn">Войти</button>
+        </p>
+    </form>
+    <p><a href="{% url 'shop:product_list' %}">Перейти к просмотру товаров в роли гостя</a></p>
+</div>
+{% endblock %}

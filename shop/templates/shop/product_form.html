@@ -1,0 +1,94 @@
+{% extends 'shop/base.html' %}
+{% block title %}{% if is_edit %}Редактирование товара{% else %}Добавление товара{% endif %} — Магазин обуви{% endblock %}
+{% block nav %}
+    <a href="{% url 'shop:product_list' %}" class="btn btn-secondary">Назад к списку</a>
+{% endblock %}
+{% block content %}
+<h1>{% if is_edit %}Редактирование товара{% else %}Добавление товара{% endif %}</h1>
+
+<form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    {% if form.non_field_errors %}<ul class="messages"><li class="error">{{ form.non_field_errors }}</li></ul>{% endif %}
+
+    <p style="margin-bottom: 16px;">
+        <strong>Фото товара:</strong><br>
+        <img src="{{ product_image_url }}" alt="" class="product-img" style="width: 300px; height: 200px; object-fit: contain; border: 1px solid #ddd;" id="imgPreview" onerror="this.src='/static/img/picture.png'"><br>
+        При отсутствии изображения отображается заглушка (picture.png).
+    </p>
+
+    {% if is_edit %}
+    <p>
+        <label>ID товара (только для чтения):</label><br>
+        <input type="text" value="{{ product.id }}" readonly disabled>
+    </p>
+    <p>
+        <label>Артикул (только для чтения):</label><br>
+        {{ form.article }}
+        {% if form.article.errors %}<span style="color: red;">{{ form.article.errors }}</span>{% endif %}
+    </p>
+    {% else %}
+    <p>
+        <label>Артикул (при добавлении вычисляется автоматически, можно задать вручную):</label><br>
+        {{ form.article }}
+        {% if form.article.errors %}<span style="color: red;">{{ form.article.errors }}</span>{% endif %}
+    </p>
+    {% endif %}
+
+    <p>
+        <label>{{ form.name.label }}:</label><br>
+        {{ form.name }}
+        {% if form.name.errors %}<span style="color: red;">{{ form.name.errors }}</span>{% endif %}
+    </p>
+    <p>
+        <label>{{ form.category.label }} (выпадающий список):</label><br>
+        {{ form.category }}
+        {% if form.category.errors %}<span style="color: red;">{{ form.category.errors }}</span>{% endif %}
+    </p>
+    <p>
+        <label>{{ form.description.label }}:</label><br>
+        {{ form.description }}
+        {% if form.description.errors %}<span style="color: red;">{{ form.description.errors }}</span>{% endif %}
+    </p>
+    <p>
+        <label>{{ form.producer.label }} (выпадающий список):</label><br>
+        {{ form.producer }}
+        {% if form.producer.errors %}<span style="color: red;">{{ form.producer.errors }}</span>{% endif %}
+    </p>
+    <p>
+        <label>{{ form.supplier.label }}:</label><br>
+        {{ form.supplier }}
+        {% if form.supplier.errors %}<span style="color: red;">{{ form.supplier.errors }}</span>{% endif %}
+    </p>
+    <p>
+        <label>{{ form.price.label }} (не отрицательная, допускаются сотые):</label><br>
+        {{ form.price }}
+        {% if form.price.errors %}<span style="color: red;">{{ form.price.errors }}</span>{% endif %}
+    </p>
+    <p>
+        <label>{{ form.unit.label }}:</label><br>
+        {{ form.unit }}
+        {% if form.unit.errors %}<span style="color: red;">{{ form.unit.errors }}</span>{% endif %}
+    </p>
+    <p>
+        <label>{{ form.quantity.label }} (не отрицательное):</label><br>
+        {{ form.quantity }}
+        {% if form.quantity.errors %}<span style="color: red;">{{ form.quantity.errors }}</span>{% endif %}
+    </p>
+    <p>
+        <label>{{ form.discount.label }}:</label><br>
+        {{ form.discount }}
+        {% if form.discount.errors %}<span style="color: red;">{{ form.discount.errors }}</span>{% endif %}
+    </p>
+    <p>
+        <label>{{ form.image_upload.label }}:</label><br>
+        {{ form.image_upload }}
+        {{ form.image_upload.help_text }}
+        {% if form.image_upload.errors %}<span style="color: red;">{{ form.image_upload.errors }}</span>{% endif %}
+    </p>
+
+    <p>
+        <button type="submit" class="btn">Сохранить</button>
+        <button type="submit" name="cancel" value="1" class="btn btn-secondary">Отмена</button>
+    </p>
+</form>
+{% endblock %}

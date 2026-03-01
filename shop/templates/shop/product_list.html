@@ -1,0 +1,93 @@
+{% extends 'shop/base.html' %}
+{% block title %}Список товаров — Магазин обуви{% endblock %}
+{% block nav %}
+    <a href="{% url 'shop:login' %}">Назад к входу</a>
+    {% if role == 'admin' %}<a href="{% url 'shop:product_add' %}" class="btn">Добавить товар</a>{% endif %}
+{% endblock %}
+{% block content %}
+<h1>Список товаров</h1>
+
+{% if can_search_sort_filter %}
+<div class="filters">
+    <form method="get" action="{% url 'shop:product_list' %}" id="filterForm" style="display: flex; flex-wrap: wrap; gap: 12px; align-items: center;">
+        <label>Поиск:</label>
+        <input type="text" name="search" value="{{ search }}" placeholder="По всем текстовым полям" style="min-width: 200px;" id="searchInput">
+        <label>Поставщик:</label>
+        <select name="supplier" onchange="this.form.submit()">
+            <option value="">Все поставщики</option>
+            {% for sid, sname in suppliers %}
+            <option value="{{ sid }}" {% if supplier_id == sid|stringformat:"d" %}selected{% endif %}>{{ sname }}</option>
+            {% endfor %}
+        </select>
+        <label>Сортировка по кол-ву:</label>
+        <select name="sort" onchange="this.form.submit()">
+            <option value="">—</option>
+            <option value="quantity_asc" {% if sort == 'quantity_asc' %}selected{% endif %}>По возрастанию</option>
+            <option value="quantity_desc" {% if sort == 'quantity_desc' %}selected{% endif %}>По убыванию</option>
+        </select>
+    </form>
+</div>
+<script>
+(function(){
+    var form = document.getElementById('filterForm');
+    var searchInput = document.getElementById('searchInput');
+    var timer;
+    if (searchInput && form) {
+        searchInput.oninput = function(){ clearTimeout(timer); timer = setTimeout(function(){ form.submit(); }, 400); };
+    }
+})();
+</script>
+{% endif %}
+
+<table>
+    <thead>
+        <tr>
+            <th>Фото</th>
+            <th>Наименование</th>
+            <th>Категория</th>
+            <th>Описание</th>
+            <th>Производитель</th>
+            <th>Поставщик</th>
+            <th>Цена</th>
+            <th>Ед. изм.</th>
+            <th>Кол-во</th>
+            <th>Скидка %</th>
+            {% if role == 'admin' %}<th>Действия</th>{% endif %}
+        </tr>
+    </thead>
+    <tbody>
+        {% for product in product_list %}
+        <tr class="{% if product.quantity == 0 %}out-of-stock{% elif product.discount > 15 %}discount-high{% endif %}">
+            <td>
+                <img src="{{ product.image_url }}" alt="" class="product-img" onerror="this.src='/static/img/picture.png'">
+            </td>
+            <td>{{ product.name }}</td>
+            <td>{{ product.category.name }}</td>
+            <td>{{ product.description|truncatewords:15 }}</td>
+            <td>{{ product.producer.name }}</td>
+            <td>{{ product.supplier.name }}</td>
+            <td>
+                {% if product.has_reduced_price %}
+                <span class="price-reduced">{{ product.price }} ₽</span>
+                <span class="price-final">{{ product.final_price }} ₽</span>
+                {% else %}
+                {{ product.price }} ₽
+                {% endif %}
+            </td>
+            <td>{{ product.unit.name }}</td>
+            <td>{{ product.quantity }}</td>
+            <td>{{ product.discount }}</td>
+            {% if role == 'admin' %}
+            <td>
+                <a href="{% url 'shop:product_edit' product.pk %}" class="btn btn-secondary">Изменить</a>
+                <a href="{% url 'shop:product_delete' product.pk %}" class="btn btn-danger" onclick="return confirm('Удалить товар «{{ product.name }}»?');">Удалить</a>
+            </td>
+            {% endif %}
+        </tr>
+        {% empty %}
+        <tr><td colspan="11">Нет товаров.</td></tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+{% endblock %}

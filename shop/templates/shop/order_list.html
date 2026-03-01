@@ -1,0 +1,42 @@
+{% extends 'shop/base.html' %}
+{% block title %}Заказы — Магазин обуви{% endblock %}
+{% block nav %}
+    <a href="{% url 'shop:product_list' %}" class="btn btn-secondary">Назад к списку товаров</a>
+{% endblock %}
+{% block content %}
+<h1>Заказы</h1>
+<table>
+    <thead>
+        <tr>
+            <th>Номер</th>
+            <th>Клиент</th>
+            <th>Дата создания</th>
+            <th>Дата доставки</th>
+            <th>Пункт выдачи</th>
+            <th>Статус</th>
+            <th>Состав</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for order in order_list %}
+        <tr>
+            <td>{{ order.number }}</td>
+            <td>{{ order.client_name|default:order.client.username }}</td>
+            <td>{{ order.date_created|date:"d.m.Y" }}</td>
+            <td>{{ order.date_delivery|date:"d.m.Y"|default:"—" }}</td>
+            <td>{{ order.pickup_point.address|default:"—" }}</td>
+            <td>{{ order.get_status_display }}</td>
+            <td>
+                {% for item in order.items.all %}
+                {{ item.product.article }} × {{ item.quantity }}{% if not forloop.last %}, {% endif %}
+                {% empty %}
+                —
+                {% endfor %}
+            </td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="7">Нет заказов.</td></tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}
